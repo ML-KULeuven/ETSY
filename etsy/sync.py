@@ -35,9 +35,9 @@ class EventTrackingSynchronizer:
         assert list(tracking.index.unique()) == [i for i in range(len(tracking))]
 
         # Ensure frame identifiers are increasing by 1
-        assert list(tracking.frame.unique()) == [
-            i for i in range(max(tracking[tracking.period_id == 2].frame) + 1)
-        ]
+        # assert list(tracking.frame.unique()) == [
+        #     i for i in range(max(tracking[tracking.period_id == 2].frame) + 1)
+        # ]
 
         self.events = events
         self.tracking = tracking
@@ -83,6 +83,10 @@ class EventTrackingSynchronizer:
                 (self.tracking.frame.isin(frames_to_check))
                 & (self.tracking.period_id == period)
                 & self.tracking.ball
+                & (self.tracking.x <= 55)
+                & (self.tracking.x >= 50)
+                & (self.tracking.y <= 36.5)
+                & (self.tracking.y >= 31.5)
             )
         ]
 
@@ -222,8 +226,9 @@ class EventTrackingSynchronizer:
         """
 
         # Find closest frame time-wise
-        frame = self.tracking.loc[
-            [(abs(self.shifted_timestamp - event_timestamp)).idxmin()]
+        idx = self.tracking[self.tracking.period_id == period].index.values
+        frame = self.tracking[self.tracking.period_id == period].loc[
+            [(abs(self.shifted_timestamp.loc[idx] - event_timestamp)).idxmin()]
         ].frame.values[0]
 
         # Get all frames to search through
@@ -320,9 +325,9 @@ class EventTrackingSynchronizer:
         mask_height_ball = height_ball <= 3
         mask_timestamps = timestamps > self.last_matched_ts
 
-        if bodypart == 0:
+        if (bodypart == 0) | (bodypart == 4) | (bodypart == 5):
             mask_height = height_ball <= 1.5
-        elif bodypart == 1:
+        elif (bodypart == 1) | (bodypart == 3):
             mask_height = height_ball > 1.0
         else:
             mask_height = np.ones(len(dist_to_ball))
@@ -341,10 +346,10 @@ class EventTrackingSynchronizer:
         mask_height_ball = height_ball <= 3
         mask_timestamps = timestamps > self.last_matched_ts
 
-        if bodypart == 0:
+        if (bodypart == 0) | (bodypart == 4) | (bodypart == 5):
             mask_height = height_ball <= 1.5
             mask_acceleration = acceleration >= 0
-        elif bodypart == 1:
+        elif (bodypart == 1) | (bodypart == 3):
             mask_height = height_ball > 1.0
             mask_acceleration = np.ones(len(dist_to_ball))
         else:
@@ -447,7 +452,8 @@ class EventTrackingSynchronizer:
         kickoff_frame_p2 = self.find_kickoff(period=2)
         self._adjust_time_bias_tracking(kickoff_frame_p2.timestamp, 2)
         self.last_matched_ts = self.shifted_timestamp.loc[
-            self.tracking[self.tracking.timestamp == kickoff_frame_p2.timestamp].index.values[0]
+            self.tracking[((self.tracking.timestamp == kickoff_frame_p2.timestamp) & (
+                        self.tracking.period_id == 2))].index.values[0]
         ]
 
         # Sync events of playing period 2

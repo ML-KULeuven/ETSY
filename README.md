@@ -16,7 +16,7 @@
 The algorithm synchronizes each playing period separately using two steps:
 
 1. *Synchronize kickoff*: removes the constant time-bias due to the clocks in the event and tracking data not starting at the same time.
-2. *Synchronize remaining events using rule-base*: uses event-specific rules and a distance-based score function to identify the best matching frame within a selected time window around each event. 
+2. *Synchronize remaining events using a rule-base*: uses event-specific rules and a distance-based score function to identify the best matching frame within a selected time window around each event. 
 
 ## Installation
 
@@ -60,6 +60,10 @@ If you make use of this package in your research, please consider citing the fol
 
 - Maaike Van Roy, Lorenzo Cascioli, and Jesse Davis. **ETSY: A rule-based approach to Event and Tracking data SYnchronization**. In Machine Learning and Data Mining for Sports Analytics ECML/PKDD 2023 Workshop (2023). <br/>[ [bibtex](./docs/etsy.bibtex) ]
 
+
+Additionally, the following blog post gives an overview of ETSY:
+
+- [Introducing ETSY](https://dtai.cs.kuleuven.be/sports/blog/etsy:-a-rule-based-approach-to-event-and-tracking-data-synchronization)
 
 ## License
 
